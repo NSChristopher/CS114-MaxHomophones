@@ -24,9 +24,10 @@ public class MaxHomophones {
     
 
     public static void displayMaxHomophones(File file, int nLines) {
-        OALDictionary maxHomophDict = new OALDictionary<String, String>();
 
         processFile(file, nLines);
+
+
 
         int maxHomophones = 0;
         for (int i = 0; i < keyArray.size(); i++) {
@@ -41,6 +42,8 @@ public class MaxHomophones {
                 maxHomophones = numOfHomoph;
             numDuplicatesArray.add(i,numOfHomoph);
         }
+        if(maxHomophones <= 1)
+            return;
 
         ArrayList<Integer> corrIndexValues = new ArrayList<>();
         for (int i = 0; i < numDuplicatesArray.size(); i++) {
@@ -55,7 +58,7 @@ public class MaxHomophones {
         }
 
 
-
+        //print out
         System.out.println(maxHomophones);
         for (String key : corrKeys) {
             for (var string : pronunciationDict.findAll(key)) {
@@ -63,7 +66,6 @@ public class MaxHomophones {
             }
             System.out.println();
         }
-
     }
 
     private static void processFile(File file, int nLines) {
