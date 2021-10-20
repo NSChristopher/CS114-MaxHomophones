@@ -18,51 +18,40 @@ public class MaxHomophones {
         displayMaxHomophones(file, nLines);
     }
 
-    public static OALDictionary pronunciationDict = new OALDictionary<String, String>();
-    public static ArrayList<String> keyArray = new ArrayList();
-    public static ArrayList<Integer> numDuplicatesArray = new ArrayList();
+    static OALDictionary pronunciationDict = new OALDictionary<String, Pronunciation>();
+    static ArrayList<String> pronunciationArray = new ArrayList();
     
 
     public static void displayMaxHomophones(File file, int nLines) {
 
         processFile(file, nLines);
 
+        int maxHomophones = 1;
+        for (Pronunciation p : (ArrayList<Pronunciation>)pronunciationDict.values()) {
+            if(pronunciationArray.contains(p.pronunciation)) continue;
 
-
-        int maxHomophones = 0;
-        for (int i = 0; i < keyArray.size(); i++) {
-            int numOfHomoph = 1;
-            for (int j = 0; j < keyArray.size(); j++) {
-                if(i == j) continue;
-                if (keyArray.get(i).equals(keyArray.get(j))){
-                    numOfHomoph++;
-                }
+            int pHomophones = p.NumOfMatchingKeys(pronunciationDict);
+            if(pHomophones < maxHomophones) continue;
+            if(pHomophones == maxHomophones) {
+                pronunciationArray.add(p.pronunciation);
             }
-            if(maxHomophones < numOfHomoph)
-                maxHomophones = numOfHomoph;
-            numDuplicatesArray.add(i,numOfHomoph);
-        }
-        if(maxHomophones <= 1)
-            return;
+            if(pHomophones > maxHomophones) {
+                pronunciationArray.clear();
+                pronunciationArray.add(p.pronunciation);
+                maxHomophones = pHomophones;
+            }
 
-        ArrayList<Integer> corrIndexValues = new ArrayList<>();
-        for (int i = 0; i < numDuplicatesArray.size(); i++) {
-                if(numDuplicatesArray.get(i) == maxHomophones)
-                    corrIndexValues.add(i);
         }
+        
 
-        ArrayList<String> corrKeys = new ArrayList<>();
-        for (int i = 0; i < corrIndexValues.size(); i++) {
-            if(!corrKeys.contains(keyArray.get(corrIndexValues.get(i))))
-            corrKeys.add(keyArray.get(corrIndexValues.get(i)));
-        }
+        if(maxHomophones == 1) return;
 
 
         //print out
         System.out.println(maxHomophones);
-        for (String key : corrKeys) {
-            for (var string : pronunciationDict.findAll(key)) {
-                System.out.println(string.toString());
+        for (String pronunciation : pronunciationArray) {
+            for (Pronunciation p : (ArrayList<Pronunciation>)pronunciationDict.findAll(pronunciation)) {
+                System.out.println(p.word);
             }
             System.out.println();
         }
@@ -80,8 +69,8 @@ public class MaxHomophones {
                 else {
                     String[] splitLine = currentLine.split("  ");
 
-                    pronunciationDict.insert(splitLine[1], splitLine[0]);
-                    keyArray.add(splitLine[1]);
+                    Pronunciation p = new Pronunciation(splitLine[0], splitLine[1]);
+                    pronunciationDict.insert(splitLine[1], p);
 
                     linesRead++;     
                 }
